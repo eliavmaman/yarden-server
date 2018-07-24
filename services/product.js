@@ -51,6 +51,22 @@ module.exports = {
             });
 
         });
+    },
+    delete: (req, res) => {
+        let id = req.params.id;
+
+        Product.findOne({_id: id}, (err, p) => {
+            if (err) throw err;
+
+            p.active = false;
+
+            p.save((err, prod) => {
+                if (err) throw err;
+
+                res.json(prod);
+            });
+        });
+
     }
 
 

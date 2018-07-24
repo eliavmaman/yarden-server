@@ -11,7 +11,7 @@ module.exports = {
         });
     },
     list: (req, res) => {
-        Category.find((err, categories) => {
+        Category.find({'active':true},(err, categories) => {
             if (err) throw err;
             res.json(categories);
         });
@@ -42,5 +42,23 @@ module.exports = {
             });
         });
 
+    },
+    delete: (req, res) => {
+        let catId = req.params.id;
+
+        Category.findOne({_id: catId}, (err, c) => {
+            if (err) throw err;
+
+            c.active = false;
+
+            c.save((err, newCategory) => {
+                if (err) throw err;
+
+                res.json(newCategory);
+            });
+        });
+
     }
+
+
 };

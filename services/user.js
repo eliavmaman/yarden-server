@@ -25,26 +25,44 @@ module.exports = {
         });
     },
     list: (req, res) => {
-        User.find((err, users) => {
+        User.find({active:true},(err, users) => {
             if (err) throw err;
             res.json(users);
         });
     },
     update: (req, res) => {
         let pId = req.params.id;
-        let password = req.body;
+        let password = req.body.password;
 
-        User.findOne({_id: pId}, (err,) => {
+        User.findOne({_id: pId}, (err,user) => {
             if (err) throw err;
 
-            p.password = password;
+            user.password = password;
 
-            p.save((err, newUser) => {
+            user.save((err, newUser) => {
                 if (err) throw err;
 
                 res.json(newUser);
             });
 
         });
+    },
+    delete: (req, res) => {
+
+        console.log('delete user' + req.params.id);
+        let id = req.params.id;
+
+        User.findOne({_id: id}, (err, u) => {
+            if (err) throw err;
+
+            u.active = false;
+
+            u.save((err, user) => {
+                if (err) throw err;
+
+                res.json(user);
+            });
+        });
+
     }
 };
