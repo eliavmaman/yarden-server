@@ -9,9 +9,9 @@ const cors=require('cors');
 
 router.all('*', cors());
 // when route to /login the the func login in users.js will run
-//router.route('/login').post(userService.login);
+router.route('/login').post(userService.login);
 // when route to /register the the func register in users.js will run
-//router.route('/register').post(userService.register);
+router.route('/register').post(userService.register);
 //users
 
 router.route('/users/:id').put(userService.update);

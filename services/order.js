@@ -46,10 +46,7 @@ module.exports = {
             o.user = order.user;
             o.products = order.products;
             o.price = order.price;
-            o.city = order.city;
-            o.street = order.street;
             o.order_date = order.order_date;
-            o.delivery_date = order.delivery_date;
             o.card_digits = order.card_digits;
 
             o.save((err, newOrder) => {
