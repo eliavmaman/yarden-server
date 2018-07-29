@@ -12,6 +12,8 @@
     "body-parser": "~1.0.1",
     "cors": "^2.8.4",
     "express": "~4.0.0",
-    "mongoose": "~4.4.19"
+    "http-status": "^1.2.0",
+    "mongoose": "~4.4.19",
+    "socket.io": "^2.1.1"
   }
 }
