@@ -12,7 +12,7 @@ module.exports = {
         });
     },
     list: (req, res) => {
-        Order.find().populate('category', 'name').exec((err, order) => {
+        Order.find().populate('products').exec((err, order) => {
             if (err) throw err;
 
             res.json(order);
@@ -56,7 +56,29 @@ module.exports = {
             });
 
         });
-    }
+    },
+    getMostRecommandedProduct: (req, res) => {
+        let pId = req.params.id;
+
+
+        Order.find({_id: pId}, (err, orders) => {
+            if (err) throw err;
+            let allprods = [];
+            orders.forEach((o) => {
+                o.products.forEach((p) => {
+                    if (pInAllProducts(p)) {
+                        allprods[p.name]++;
+                    } else {
+                        allprods[p.name] = 0;
+                    }
+                })
+            });
+            console.log(allprods);
+            var max = Object.keys(allprods).reduce((a, b) => allprods[a] > allprods[b] ? a : b);
+            console.log(max);
+
+        });
+    },
 
 
 };

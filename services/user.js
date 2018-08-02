@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Order = require('../models/order');
 
 
 module.exports = {
@@ -24,8 +25,15 @@ module.exports = {
             return res.json(user);
         });
     },
+    getUserOrders: (req, res) => {
+        let id = req.params.id;
+        Order.find({user: id}).populate('products').exec((err, orders) => {
+            if (err) throw err;
+            res.json(orders);
+        });
+    },
     list: (req, res) => {
-        User.find({active:true},(err, users) => {
+        User.find({active: true}, (err, users) => {
             if (err) throw err;
             res.json(users);
         });
@@ -34,7 +42,7 @@ module.exports = {
         let pId = req.params.id;
         let password = req.body.password;
 
-        User.findOne({_id: pId}, (err,user) => {
+        User.findOne({_id: pId}, (err, user) => {
             if (err) throw err;
 
             user.password = password;

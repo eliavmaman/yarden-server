@@ -24,9 +24,12 @@ router.route('/categories/:id').delete(categoryService.delete);
 
 // products
 router.route('/products').post(productService.create);
+
 router.route('/products').get(productService.list);
 router.route('/products/:id').get(productService.byId);
 router.route('/products/:id').put(productService.update);
+router.route('/prodbycat').get(productService.groupByCategory);
+
 
 // order
 router.route('/orders').post(orderService.create);
@@ -34,11 +37,12 @@ router.route('/orders').get(orderService.list);
 router.route('/ordersByDate').post(orderService.ordersByDate);
 router.route('/orders/:id').get(orderService.byId);
 router.route('/orders/:id').put(orderService.update);
+router.route('/getMostRecommandedProduct/:id').put(orderService.getMostRecommandedProduct);
 
 // users
 router.route('/users').post(userService.register);
 router.route('/users').get(userService.list);
-//router.route('/users/:id').get(userService.byId);
+router.route('/users/:id/orders').get(userService.getUserOrders);
 router.route('/users/:id').put(userService.update);
 router.route('/users/:id').delete(userService.delete);
 
