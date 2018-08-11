@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const Order = require('../models/order');
+const Product = require('../models/product');
+const brain = require('brain.js');
 
 
 module.exports = {
@@ -38,6 +40,15 @@ module.exports = {
             res.json(users);
         });
     },
+    maps: (req, res) => {
+        var locations = [
+            ['Location 1 Name', 'New York, NY', 'Location 1 URL'],
+            ['Location 2 Name', 'Newark, NJ', 'Location 2 URL'],
+            ['Location 3 Name', 'Philadelphia, PA', 'Location 3 URL']
+        ];
+        res.json(locations);
+    },
+
     update: (req, res) => {
         let pId = req.params.id;
         let password = req.body.password;
@@ -72,5 +83,95 @@ module.exports = {
             });
         });
 
-    }
+    },
+    groupByGender: (req, res) => {
+        User.aggregate([
+            {
+                $group: {
+                    _id: "$gender",
+                    count: {$sum: 1}
+                }
+            }]
+        ).exec((err, users) => {
+            if (err) throw err;
+            res.json(users);
+        })
+    },
+    getml: (req, res) => {
+        let id = req.params.id;
+        let userProducts = [];
+        let trainData = [];
+
+        Order.find({user: id}).populate('products').exec((err, orders) => {
+
+            if (err) throw err;
+
+            orders.forEach((o) => {
+                console.log('start 1')
+                o.products.forEach((p) => {
+                    userProducts.push(p);
+                    // trainData.push({input: {name: p.name, price: p.price}, output: {goodProduct: 1}});
+                    trainData.push({input: p.name, output: 1});
+                });
+
+            })
+
+            let allProducts = [];
+            Product.find({}, (err, products) => {
+
+                if (err) throw err;
+                allProducts = products;
+                products.forEach((p) => {
+                    console.log('start 2')
+                    var found = userProducts.filter((up) => {
+                        return up._id == p._id;
+                    });
+
+                    if (!found) {
+                        console.log('NOT EXIST ------' + JSON.stringify(p));
+                        //trainData.push({input: {name: p.name, price: p.price}, output: {goodProduct: 0}});
+                        //trainData.push({input: [p.price], output: [0]});
+                    }
+                })
+
+                let net = new brain.NeuralNetwork();
+
+                console.log('TRAIN DATA ___________');
+                console.log(trainData);
+                if (trainData.length>0) {
+                    net.train(trainData);
+
+
+                    let bestProduct;
+                    let bestProductPredicate = 0;
+                    let output;
+                    allProducts.forEach((p) => {
+
+                        console.log('test ------ ');
+                        console.log({name: p.name, price: p.price});
+                        //output = net.run({_id: p._id, name: p.name, price: p.price});
+                        output = net.run(p.name);
+                        console.log('output ------' + JSON.stringify(output));
+                        if (output > bestProductPredicate) {
+                            bestProductPredicate = output;
+                            bestProduct = p;
+                        }
+
+                    });
+
+
+                    console.log('best product-' + JSON.stringify(bestProduct));
+
+                    res.json(bestProduct);
+                }else{
+                    res.json({});
+                }
+
+            });
+
+
+        });
+
+
+    },
 };
